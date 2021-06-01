@@ -1,0 +1,36 @@
+service: localstack-lambda
+plugins:
+  - serverless-localstack
+
+custom:
+  localstack:
+    debug: true
+    stages:
+      - local
+      - dev
+    endpointFile: localstack_endpoints.json
+
+frameworkVersion: '2.15'
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+
+functions:
+  hello:
+    handler: handler.hello
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - queueEranTester2
+              - Arn
+      - http:
+          path: test
+          method: get
+resources:
+  Resources:
+    queueEranTester2:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: "queueEranTester2"

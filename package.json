@@ -1,0 +1,26 @@
+{
+  "name": "serverless_ci",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "clean": "rimraf ./dist",
+    "docker:build:local": "docker-compose up -d",
+    "deploy:local": "sls deploy --stage local",
+    "start:local": "npm run docker:build:local && npm run deploy:local"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eranmit99/serverless_ci.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/eranmit99/serverless_ci/issues"
+  },
+  "homepage": "https://github.com/eranmit99/serverless_ci#readme",
+  "dependencies": {
+    "serverless": "^2.15.0",
+    "serverless-localstack": "^0.4.32"
+  }
+}
