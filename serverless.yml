@@ -1,20 +1,10 @@
 service: localstack-lambda
-plugins:
-  - serverless-localstack
-
-custom:
-  localstack:
-    debug: true
-    stages:
-      - local
-      - dev
-    endpointFile: localstack_endpoints.json
-
 frameworkVersion: '2.15'
 
 provider:
   name: aws
   runtime: nodejs12.x
+  role: arn:aws:iam::407825239838:role/iot_to_lambda
 
 functions:
   hello:
@@ -34,3 +24,14 @@ resources:
       Type: "AWS::SQS::Queue"
       Properties:
         QueueName: "queueEranTester2"
+
+plugins:
+  - serverless-localstack
+
+custom:
+  localstack:
+    debug: true
+    stages:
+      - local
+      - dev
+    endpointFile: localstack_endpoints.json
