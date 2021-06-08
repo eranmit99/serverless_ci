@@ -2,3 +2,4 @@
 /stack.json
 /.serverless/
 .idea/
+/deploy-output.json

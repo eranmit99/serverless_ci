@@ -4,4 +4,4 @@ npm install
 
 npm run start:local
 
-npm test
+npm run test

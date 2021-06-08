@@ -1,9 +1,7 @@
 const fs = require('fs');
 
-
-
 function getServerlessEndPointHash(data) {
-   return data.ServiceEndpoint.split('http://')[1].split('.')[0]
+   return data.ServiceEndpoint.split('https://')[1].split('.')[0]
 }
 
 function handler (data, serverless, options) {
@@ -12,7 +10,6 @@ function handler (data, serverless, options) {
    fs.writeFileSync('./deploy-output.json', JSON.stringify({
       apiHash: getServerlessEndPointHash(data)
    }));
-   //console.log('Received Stack Output', data);
 }
 
 

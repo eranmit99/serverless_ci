@@ -1,21 +1,99 @@
 version: 2.1
 orbs:
-  node: circleci/node@1.1.6
-  docker: circleci/docker@0.5.19
-  aws-cli: circleci/aws-cli@1.3.1
+    node: circleci/node@4.1.0
+    versatile: versatile/circleci-deployments@1.1.0
+    aws-cli: circleci/aws-cli@1.3.1
+
+defaults: &defaults
+    working_directory: ~/project
+    executor:
+        name: node/default
+        tag: '14.15'
+
+default-filtering: &default-filtering
+    filters:
+      branches:
+        only: main
+      tags:
+        only: /^staging$/
+      
 jobs:
-  build:
-    machine: true
-    steps:
-      - checkout
-      - node/install:
-          node-version: "14.16.1"
-      # - aws-cli/setup:
-      #     profile-name: vn
-      - docker/install-docker
-      - run: ./.circleci/test.sh
+    code_backup:
+        executor: aws-cli/default
+        steps:
+            - checkout
+            - aws-cli/setup:
+                  profile-name: default
+            - run: ./.circleci/backup.sh
+    build:
+        <<: *defaults
+        steps:
+            - node/install-npm:
+                  version: 7.6.0
+            - checkout
+            - run: env
+            - node/install-packages
+            - run:
+                  command: 'npm run build'
+                  name: 'Build app'
+            - persist_to_workspace:
+                  root: ~/project
+                  paths:
+                      - dist
+                      - Dockerfile
+                      - Dockerfile.ecs
+                      - package.json
+                      - .npmrc
+                      - package-lock.json
+                      - node_modules
+                      - server/package.json
+                      - dto/package.json
+    e2e:
+        machine:
+            image: ubuntu-2004:202101-01
+        steps:
+            - checkout
+            - run:
+                  name: Install  Node.js with built-in nvm tool
+                  # https://www.cloudesire.com/how-to-upgrade-node-on-circleci-machine-executor/
+                  command: |
+                      export NVM_DIR="/opt/circleci/.nvm"
+                      [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+                      nvm install v14.15.4
+                      nvm alias default v14.15.4
+            - run:
+                  name: Check node version
+                  command: |
+                      node -v
+            - node/install-npm:
+                  version: 7.6.0
+            - run:
+                  name: workaround npm cert issue # https://github.com/CircleCI-Public/android-image-preview-docs/issues/14
+                  command: npm index -g delete ca
+            - run: env
+            - node/install-packages
+            - run:
+                  command: 'npm run test:e2e'
+                  name: 'Build and test docker image'
 
 workflows:
-  build:
-    jobs:
-      - build
+    e2e:
+        jobs:
+            - e2e:
+                  context: base-context
+    test:
+        jobs:
+            - node/test:
+                  name: 'Test'
+                  context: base-context
+                  setup:
+                      - node/install-npm:
+                            version: 7.6.0
+                  matrix:
+                      parameters:
+                          version: ['14.15.4', '12.20.1']
+    push-and-deploy:
+        jobs:
+            - build:
+                  context: base-context
+                  <<: *default-filtering

@@ -63,10 +63,16 @@ plugins:
 custom:
   output:
     handler: scripts/output.handler # Same syntax as you already know
-    file: .build/stack.json # toml, yaml, yml, and json format is available
+  customDomain:
+    - http:
+        domainName: registered_domain_name
+        basePath: ''
+        createRoute53Record: true
   localstack:
     debug: true
     stages:
       - local
       - dev
     endpointFile: localstack_endpoints.json
+    #autostart: true  # optional - Start LocalStack in Docker on Serverless deploy
+
