@@ -18,5 +18,4 @@ jobs:
 workflows:
   build:
     jobs:
-      - build:
-          context: base-context
+      - build
