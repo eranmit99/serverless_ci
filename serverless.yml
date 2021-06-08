@@ -24,11 +24,45 @@ resources:
       Type: "AWS::SQS::Queue"
       Properties:
         QueueName: "queueEranTester2"
+    ExampleQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: example-queue
+    ExampleUser:
+      Type: "AWS::IAM::User"
+      Properties:
+        UserName: example-user
+        Policies:
+          - PolicyName: ExampleUserSQSPolicy
+            PolicyDocument:
+              Version: '2017'
+              Statement:
+                - Effect: "Allow"
+                  Action:
+                    - sqs:SendMessage
+                  Resource:
+                    - {"Fn::Join": [":", ["arn:aws:sqs:*", {"Ref": "AWS::AccountId"}, "example-queue"]]}
+    ExampleUserKey:
+      Type: AWS::IAM::AccessKey
+      Properties:
+        UserName:
+          Ref: ExampleUser
+  Outputs:
+    ExampleUserKey:
+      Value:
+        Ref: ExampleUserKey
+    ExampleUserSecret:
+      Value: {"Fn::GetAtt": ["ExampleUserKey", "SecretAccessKey"]}
+    ExampleStaticValue:
+      Value: example-static-value
 
 plugins:
   - serverless-localstack
+  - serverless-stack-output
 
 custom:
+  handler: scripts/output.handler # Same syntax as you already know
+  file: .build/stack.json # toml, yaml, yml, and json format is available
   localstack:
     debug: true
     stages:

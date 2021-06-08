@@ -5,9 +5,11 @@
   "main": "index.js",
   "scripts": {
     "clean": "rimraf ./dist",
+    "docker:clean": "docker-compose down",
     "docker:build:local": "docker-compose up -d",
     "deploy:local": "sls deploy --stage local",
-    "start:local": "npm run docker:build:local && npm run deploy:local"
+    "test": "jest",
+    "start:local": "npm run docker:clean && npm run docker:build:local && npm run deploy:local"
   },
   "repository": {
     "type": "git",
@@ -22,5 +24,9 @@
   "dependencies": {
     "serverless": "^2.15.0",
     "serverless-localstack": "^0.4.32"
+  },
+  "devDependencies": {
+    "jest": "^27.0.4",
+    "serverless-stack-output": "^0.2.3"
   }
 }
