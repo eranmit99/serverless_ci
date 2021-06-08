@@ -5,7 +5,6 @@ function generateAPIUrl(apiHash) {
     return `http://localhost:4566/restapis/${apiHash}/local/_user_request_/test`;
 }
 
-
 describe('Test', () => {
     it('/ (GET)',async () => {
         const url = generateAPIUrl(apiHash)

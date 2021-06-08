@@ -62,7 +62,7 @@ plugins:
 
 custom:
   output:
-    handler: scripts/output.handler # Same syntax as you already know
+    handler: scripts/deploy-helper.handler # Same syntax as you already know
   customDomain:
     - http:
         domainName: registered_domain_name
